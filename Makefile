@@ -2,7 +2,7 @@
 NAME = bsq
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
-SRC = src/main.c src/process.c src/parse.c src/solve.c src/utils.c
+SRC = src/main.c src/process.c src/parse.c src/solve.c src/solve2.c src/utils.c
 OBJ = $(SRC:.c=.o)
 HEADER = src/bsq.h
 

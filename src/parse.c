@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: chsifess <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/27 21:18:22 by chsifess          #+#    #+#             */
+/*   Updated: 2025/08/27 21:40:31 by chsifess         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "bsq.h"
 
 char	*read_line(int fd)
@@ -17,7 +29,7 @@ char	*read_line(int fd)
 		if (i >= size - 1)
 		{
 			size *= 2;
-			line = realloc(line, size);
+			line = ft_realloc(line, i, size);
 			if (!line)
 				return (NULL);
 		}
@@ -31,34 +43,23 @@ int	parse_first_line(int fd, int *rows, char chars[3])
 {
 	char	*first_line;
 	int		i;
-	int		len;
 
 	first_line = read_line(fd);
 	if (!first_line)
 		return (0);
-	
-	len = ft_strlen(first_line);
-	if (len < 4)
-	{
-		free(first_line);
-		return (0);
-	}
-	
+	if (ft_strlen(first_line) < 4)
+		return (free(first_line), 0);
 	i = 0;
 	while (first_line[i] && first_line[i] >= '0' && first_line[i] <= '9')
 		i++;
-	
-	if (i == 0 || len - i != 3)
+	if (i == 0 || (ft_strlen(first_line) - i) != 3)
 	{
-		free(first_line);
-		return (0);
+		return (free(first_line), 0);
 	}
-	
 	*rows = ft_atoi(first_line);
 	chars[0] = first_line[i];
 	chars[1] = first_line[i + 1];
 	chars[2] = first_line[i + 2];
-	
 	free(first_line);
 	return (*rows > 0);
 }
@@ -72,26 +73,16 @@ char	**parse_grid(int fd, int rows, int *cols)
 	grid = malloc(sizeof(char *) * rows);
 	if (!grid)
 		return (NULL);
-	
 	i = 0;
 	while (i < rows)
 	{
 		line = read_line(fd);
 		if (!line)
-		{
-			free_grid(grid, i);
-			return (NULL);
-		}
-		
+			return (free_grid(grid, i), NULL);
 		if (i == 0)
 			*cols = ft_strlen(line);
 		else if (ft_strlen(line) != *cols)
-		{
-			free(line);
-			free_grid(grid, i);
-			return (NULL);
-		}
-		
+			return (free(line), free_grid(grid, i), NULL);
 		grid[i] = line;
 		i++;
 	}
@@ -105,10 +96,8 @@ int	is_valid_grid(char **grid, int rows, int cols, char chars[3])
 
 	if (chars[0] == chars[1] || chars[0] == chars[2] || chars[1] == chars[2])
 		return (0);
-	
 	if (rows <= 0 || cols <= 0)
 		return (0);
-	
 	i = 0;
 	while (i < rows)
 	{
@@ -122,33 +111,4 @@ int	is_valid_grid(char **grid, int rows, int cols, char chars[3])
 		i++;
 	}
 	return (1);
-}
-
-void	free_grid(char **grid, int rows)
-{
-	int	i;
-
-	if (!grid)
-		return ;
-	
-	i = 0;
-	while (i < rows)
-	{
-		free(grid[i]);
-		i++;
-	}
-	free(grid);
-}
-
-void	print_grid(char **grid, int rows, int cols)
-{
-	int	i;
-
-	i = 0;
-	while (i < rows)
-	{
-		write(1, grid[i], cols);
-		write(1, "\n", 1);
-		i++;
-	}
 }
